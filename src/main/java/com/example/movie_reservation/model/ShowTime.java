@@ -34,15 +34,11 @@ public class ShowTime {
     @UpdateTimestamp
     private LocalDateTime updatedDate;
 
-    /* =======================
-       Foreign Keys
-       ======================= */
-
-   /* @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id", nullable = false)
     private Movie movie;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "screen_id", nullable = false)
-    private Screen screen; */
+    private Screen screen;
 }

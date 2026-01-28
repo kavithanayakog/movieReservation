@@ -39,11 +39,9 @@ public class Screen {
     @UpdateTimestamp
     private LocalDateTime updatedDate;
 
-    /* =======================
-       Foreign Key
-       ======================= */
 
-    /* @ManyToOne(fetch = FetchType.LAZY)
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theatre_id", nullable = false)
-    private Theatre theatre; */
+    private Theatre theatre;
 }

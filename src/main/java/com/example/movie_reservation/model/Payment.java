@@ -47,11 +47,7 @@ public class Payment {
     @UpdateTimestamp
     private LocalDateTime updatedDate;
 
-    /* =======================
-       Foreign Key
-       ======================= */
-
-    /* @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id", nullable = false)
-    private Booking booking; */
+    private Booking booking;
 }

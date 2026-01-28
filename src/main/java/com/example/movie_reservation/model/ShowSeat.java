@@ -36,16 +36,12 @@ public class ShowSeat {
     @UpdateTimestamp
     private LocalDateTime updatedDate;
 
-    /* =======================
-       Foreign Keys
-       ======================= */
-
-    /* @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "show_id", nullable = false)
     private ShowTime show;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seat_id", nullable = false)
-    private Seat seat; */
+    private Seat seat;
 }
 

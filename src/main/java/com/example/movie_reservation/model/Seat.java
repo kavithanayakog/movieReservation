@@ -36,16 +36,12 @@ public class Seat {
     @UpdateTimestamp
     private LocalDateTime updatedDate;
 
-    /* =======================
-       Foreign Keys
-       ======================= */
-
-    /* @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seat_type_id", nullable = false)
     private SeatType seatType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "screen_id", nullable = false)
-    private Screen screen; */
+    private Screen screen;
 }
 
