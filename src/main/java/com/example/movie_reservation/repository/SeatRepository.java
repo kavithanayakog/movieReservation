@@ -10,4 +10,6 @@ public interface SeatRepository extends JpaRepository<Seat,Long> {
     List<Seat> findByScreen_ScreenId(Long showId);
 
     boolean existsBySeatNumberAndScreen_ScreenId(String seatNumber, Long screenId);
+
+    boolean existsBySeatType_SeatTypeId(Long seatTypeId);
 }
