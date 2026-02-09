@@ -1,12 +1,14 @@
 package com.example.movie_reservation.service;
 
 import com.example.movie_reservation.model.Seat;
+import com.example.movie_reservation.requestDTO.SeatRequestDTO;
+import com.example.movie_reservation.responseDTO.SeatResponseDTO;
 
 import java.util.List;
 
 public interface SeatService {
 
-    Seat createSeat(Seat seat);
+    SeatResponseDTO createSeat(SeatRequestDTO seat);
 
     Seat getSeatById(Long seatId);
 
@@ -14,7 +16,7 @@ public interface SeatService {
 
     List<Seat> getSeatsByScreen(Long screenId);
 
-    Seat updateSeat(Long seatId, Seat seat);
+    SeatResponseDTO updateSeat(Long seatId, SeatRequestDTO seat);
 
     void deleteSeat(Long seatId);
 }

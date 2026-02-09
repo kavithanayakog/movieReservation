@@ -1,5 +1,6 @@
 package com.example.movie_reservation.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -27,11 +28,8 @@ public class Booking {
     @Column(name = "status", nullable = false, length = 20)
     private String status;   // PENDING, CONFIRMED, CANCELLED
 
-    @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
-    private BigDecimal totalAmount;
-
-    @Column(name = "seat_count", nullable = false)
-    private Integer seatCount;
+    @Column(name = "amount", nullable = false, precision = 10, scale = 2)
+    private BigDecimal amount;
 
     @Column(name = "created_date", updatable = false)
     @CreationTimestamp

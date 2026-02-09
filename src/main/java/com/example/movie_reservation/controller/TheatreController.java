@@ -1,6 +1,8 @@
 package com.example.movie_reservation.controller;
 
 import com.example.movie_reservation.model.Theatre;
+import com.example.movie_reservation.requestDTO.TheatreRequestDTO;
+import com.example.movie_reservation.responseDTO.TheatreResponseDTO;
 import com.example.movie_reservation.service.TheatreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +18,7 @@ public class TheatreController {
     private final TheatreService theatreService;
 
     @PostMapping
-    public Theatre createTheatre(@RequestBody Theatre theatre) {
+    public TheatreResponseDTO createTheatre(@RequestBody TheatreRequestDTO theatre) {
         return theatreService.createTheatre(theatre);
     }
 
@@ -31,9 +33,9 @@ public class TheatreController {
     }
 
     @PutMapping("/{id}")
-    public Theatre updateTheatre(
+    public TheatreResponseDTO updateTheatre(
             @PathVariable Long id,
-            @RequestBody Theatre theatre) {
+            @RequestBody TheatreRequestDTO theatre) {
         return theatreService.updateTheatre(id, theatre);
     }
 

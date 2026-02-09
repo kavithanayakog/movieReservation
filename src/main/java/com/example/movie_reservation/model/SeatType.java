@@ -1,5 +1,6 @@
 package com.example.movie_reservation.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,6 +19,7 @@ public class SeatType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(name = "seat_type_id")
     private Long seatTypeId;
 

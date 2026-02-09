@@ -1,6 +1,7 @@
 package com.example.movie_reservation.controller;
 
 import com.example.movie_reservation.model.Booking;
+import com.example.movie_reservation.responseDTO.BookingResponseDTO;
 import com.example.movie_reservation.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public Booking createBooking(
+    public BookingResponseDTO createBooking(
             @RequestParam Long userId,
             @RequestParam Long showId,
             @RequestBody List<Long> seatIds) {
@@ -35,7 +36,7 @@ public class BookingController {
     }
 
     @PutMapping("/{id}/cancel")
-    public Booking cancelBooking(@PathVariable Long id) {
+    public BookingResponseDTO cancelBooking(@PathVariable Long id) {
         return bookingService.cancelBooking(id);
     }
 

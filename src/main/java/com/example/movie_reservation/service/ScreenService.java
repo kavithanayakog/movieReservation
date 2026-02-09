@@ -1,12 +1,14 @@
 package com.example.movie_reservation.service;
 
 import com.example.movie_reservation.model.Screen;
+import com.example.movie_reservation.requestDTO.ScreenRequestDTO;
+import com.example.movie_reservation.responseDTO.ScreenResponseDTO;
 
 import java.util.List;
 
 public interface ScreenService {
 
-    Screen createScreen(Screen screen);
+    ScreenResponseDTO createScreen(ScreenRequestDTO screen);
 
     Screen getScreenById(Long screenId);
 
@@ -14,7 +16,7 @@ public interface ScreenService {
 
     List<Screen> getScreensByTheatre(Long theatreId);
 
-    Screen updateScreen(Long screenId, Screen screen);
+    ScreenResponseDTO updateScreen(Long screenId, ScreenRequestDTO screen);
 
     void deleteScreen(Long screenId);
 

@@ -1,6 +1,8 @@
 package com.example.movie_reservation.controller;
 
 import com.example.movie_reservation.model.Movie;
+import com.example.movie_reservation.requestDTO.MovieRequestDTO;
+import com.example.movie_reservation.responseDTO.MovieResponseDTO;
 import com.example.movie_reservation.service.MovieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +17,7 @@ public class MovieController {
     private final MovieService movieService;
 
     @PostMapping
-    public Movie createRole(@RequestBody Movie movie) {
+    public MovieResponseDTO createRole(@RequestBody MovieRequestDTO movie) {
         System.out.println("Creating movie: " + movie);
         return movieService.createMovie(movie);
     }
@@ -33,9 +35,9 @@ public class MovieController {
     }
 
     @PutMapping("/{id}")
-    public Movie updateRole(
+    public MovieResponseDTO updateRole(
             @PathVariable Long id,
-            @RequestBody Movie movie) {
+            @RequestBody MovieRequestDTO movie) {
         return movieService.updateMovie(id, movie);
     }
 

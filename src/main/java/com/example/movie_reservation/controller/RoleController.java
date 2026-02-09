@@ -2,6 +2,8 @@ package com.example.movie_reservation.controller;
 
 
 import com.example.movie_reservation.model.Role;
+import com.example.movie_reservation.requestDTO.RoleRequestDTO;
+import com.example.movie_reservation.responseDTO.RoleResponseDTO;
 import com.example.movie_reservation.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +16,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoleController {
 
+    @Autowired
    private final RoleService roleService;
 
     @PostMapping
-    public Role createRole(@RequestBody Role role) {
+    public RoleResponseDTO createRole(@RequestBody RoleRequestDTO role) {
+
         System.out.println("Creating role: " + role);
         return roleService.createRole(role);
     }
@@ -33,9 +37,10 @@ public class RoleController {
     }
 
     @PutMapping("/{id}")
-    public Role updateRole(
+    public  RoleResponseDTO updateRole(
             @PathVariable Long id,
-            @RequestBody Role role) {
+            @RequestBody RoleRequestDTO role) {
+
         return roleService.updateRole(id, role);
     }
 

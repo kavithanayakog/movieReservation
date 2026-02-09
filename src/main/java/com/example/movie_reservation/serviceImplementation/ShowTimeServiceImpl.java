@@ -2,6 +2,8 @@ package com.example.movie_reservation.serviceImplementation;
 
 import com.example.movie_reservation.model.*;
 import com.example.movie_reservation.repository.*;
+import com.example.movie_reservation.requestDTO.ShowTimeRequestDTO;
+import com.example.movie_reservation.responseDTO.ShowTimeResponseDTO;
 import com.example.movie_reservation.service.ShowTimeService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +24,12 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     private  final SeatRepository seatRepository;
 
     @Override
-    public ShowTime createShowTime(ShowTime showTime) {
+    public ShowTimeResponseDTO createShowTime(ShowTimeRequestDTO showTime) {
 
-        Movie movie = movieRepository.findById(showTime.getMovie().getMovieId())
+        Movie movie = movieRepository.findById(showTime.getMovieId())
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
 
-       Screen screen = screenRepository.findById(showTime.getScreen().getScreenId())
+       Screen screen = screenRepository.findById(showTime.getScreenId())
                 .orElseThrow(() -> new RuntimeException("Screen not found"));
 
         if (!showTime.getStartTime().isBefore(showTime.getEndTime())) {
@@ -41,13 +43,19 @@ public class ShowTimeServiceImpl implements ShowTimeService {
         if (!conflicts.isEmpty()) {
             throw new RuntimeException("Show time overlaps with another show");
         }
-        showTime.setMovie(movie);
-        showTime.setScreen(screen);
 
-        ShowTime savedShow = showTimeRepository.save(showTime);
+        ShowTime ShowTimeRequest = ShowTime.builder()
+                .startTime(showTime.getStartTime())
+                .endTime(showTime.getEndTime())
+                .createdDate(showTime.getCreatedDate())
+                .updatedDate(showTime.getUpdatedDate())
+                .movie(movie)
+                .screen(screen)
+                .build();
+
+        ShowTime savedShow = showTimeRepository.save(ShowTimeRequest);
 
         // Auto-generate ShowSeats
-
         List<Seat> seats = seatRepository.findByScreen_ScreenId(
                 screen.getScreenId());
 
@@ -59,7 +67,8 @@ public class ShowTimeServiceImpl implements ShowTimeService {
                     .build();
             showSeatRepository.save(showSeat);
         }
-        return showTimeRepository.save(showTime);
+
+        return mapToResponse(savedShow);
     }
 
     @Override
@@ -74,8 +83,14 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     }
 
     @Override
-    public ShowTime updateShowTime(Long showTimeId, ShowTime showTime) {
+    public ShowTimeResponseDTO updateShowTime(Long showTimeId, ShowTimeRequestDTO showTime) {
         ShowTime existing = getShowTimeById(showTimeId);
+
+        Movie movie = movieRepository.findById(showTime.getMovieId())
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
+
+        Screen screen = screenRepository.findById(showTime.getScreenId())
+                .orElseThrow(() -> new RuntimeException("Screen not found"));
 
         if (!showTime.getStartTime().isBefore(showTime.getEndTime())) {
             throw new RuntimeException("Invalid time range");
@@ -93,8 +108,10 @@ public class ShowTimeServiceImpl implements ShowTimeService {
 
         existing.setStartTime(showTime.getStartTime());
         existing.setEndTime(showTime.getEndTime());
+        existing.setMovie(movie);
+        existing.setScreen(screen);
 
-        return showTimeRepository.save(existing);
+        return mapToResponse(showTimeRepository.save(existing));
     }
 
     @Override
@@ -116,5 +133,15 @@ public class ShowTimeServiceImpl implements ShowTimeService {
 
         return showTimeRepository.findByMovie_MovieId(movieId);
 
+    }
+
+    private ShowTimeResponseDTO mapToResponse(ShowTime showTime) {
+        return new ShowTimeResponseDTO(
+                showTime.getShowId(),
+                showTime.getStartTime(),
+                showTime.getEndTime(),
+                showTime.getMovie().getName(),
+                showTime.getScreen().getScreenName()
+        );
     }
 }

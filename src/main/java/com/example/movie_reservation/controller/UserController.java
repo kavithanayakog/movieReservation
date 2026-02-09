@@ -1,6 +1,8 @@
 package com.example.movie_reservation.controller;
 
 import com.example.movie_reservation.model.User;
+import com.example.movie_reservation.requestDTO.UserRequestDTO;
+import com.example.movie_reservation.responseDTO.UserResponseDTO;
 import com.example.movie_reservation.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,25 +17,25 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public UserResponseDTO createUser(@RequestBody UserRequestDTO user) {
         System.out.println("Creating user: " + user);
         return userService.createUser(user);
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable Long id) {
+    public UserResponseDTO getUser(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<UserResponseDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @PutMapping("/{id}")
-    public User updateUser(
+    public UserResponseDTO updateUser(
             @PathVariable Long id,
-            @RequestBody User user) {
+            @RequestBody UserRequestDTO user) {
         return userService.updateUser(id, user);
     }
 

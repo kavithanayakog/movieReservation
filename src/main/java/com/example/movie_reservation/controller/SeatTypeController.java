@@ -2,6 +2,9 @@ package com.example.movie_reservation.controller;
 
 
 import com.example.movie_reservation.model.SeatType;
+import com.example.movie_reservation.repository.SeatTypeRepository;
+import com.example.movie_reservation.responseDTO.SeatTypeResponseDTO;
+import com.example.movie_reservation.requestDTO.SeatTypeRequestDTO;
 import com.example.movie_reservation.service.SeatTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +19,7 @@ public class SeatTypeController {
     private final SeatTypeService seatTypeService;
 
     @PostMapping
-    public SeatType createSeatType(@RequestBody SeatType seatType) {
+    public SeatTypeResponseDTO createSeatType(@RequestBody SeatTypeRequestDTO seatType) {
         return seatTypeService.createSeatType(seatType);
 
     }
@@ -32,7 +35,7 @@ public class SeatTypeController {
     }
 
     @PutMapping("/{id}")
-    public SeatType updateSeatType(@PathVariable Long id, @RequestBody SeatType seatType) {
+    public SeatTypeResponseDTO updateSeatType(@PathVariable Long id, @RequestBody SeatTypeRequestDTO seatType) {
         return seatTypeService.updateSeatType(id, seatType);
     }
 

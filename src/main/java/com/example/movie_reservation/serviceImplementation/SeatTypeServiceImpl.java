@@ -4,6 +4,8 @@ import com.example.movie_reservation.model.SeatType;
 import com.example.movie_reservation.repository.SeatRepository;
 import com.example.movie_reservation.repository.SeatTypeRepository;
 import com.example.movie_reservation.service.SeatTypeService;
+import com.example.movie_reservation.requestDTO.SeatTypeRequestDTO;
+import com.example.movie_reservation.responseDTO.SeatTypeResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,7 @@ public class SeatTypeServiceImpl implements SeatTypeService {
     private final SeatRepository seatRepository;
 
     @Override
-    public SeatType createSeatType(SeatType seatType) {
+    public SeatTypeResponseDTO createSeatType(SeatTypeRequestDTO seatType) {
 
         if(seatType.getSeatTypeName() == null || seatType.getSeatTypeName().trim().isEmpty()){
             throw new RuntimeException("Seat type name cannot be null or empty");
@@ -34,8 +36,14 @@ public class SeatTypeServiceImpl implements SeatTypeService {
         }
         seatType.setSeatTypeName(seatType.getSeatTypeName().toUpperCase());
 
+        SeatType seatTypeRequest = SeatType.builder()
+                .seatTypeName(seatType.getSeatTypeName())
+                .amount(seatType.getAmount())
+                .createdDate(seatType.getCreatedDate())
+                .updatedDate(seatType.getUpdatedDate())
+                .build();
 
-        return seatTypeRepository.save(seatType);
+        return mapToResponse(seatTypeRepository.save(seatTypeRequest));
 
     }
 
@@ -47,7 +55,7 @@ public class SeatTypeServiceImpl implements SeatTypeService {
     }
 
     @Override
-    public SeatType updateSeatType(Long seatTypeId, SeatType seatType) {
+    public SeatTypeResponseDTO updateSeatType(Long seatTypeId, SeatTypeRequestDTO seatType) {
 
         SeatType updatedSeatType = getSeatTypeById(seatTypeId);
 
@@ -66,11 +74,10 @@ public class SeatTypeServiceImpl implements SeatTypeService {
             throw new RuntimeException("Seat type name already exists");
         }
 
-
         updatedSeatType.setSeatTypeName(seatType.getSeatTypeName().toUpperCase());
         updatedSeatType.setAmount(seatType.getAmount());
 
-        return seatTypeRepository.save(updatedSeatType);
+        return mapToResponse(seatTypeRepository.save(updatedSeatType));
     }
 
     @Override
@@ -86,5 +93,15 @@ public class SeatTypeServiceImpl implements SeatTypeService {
     public List<SeatType> getAllSeatTypes() {
 
         return seatTypeRepository.findAll();
+    }
+
+    private SeatTypeResponseDTO mapToResponse(SeatType seatType) {
+        return new SeatTypeResponseDTO(
+                seatType.getSeatTypeId(),
+                seatType.getSeatTypeName(),
+                seatType.getAmount(),
+                seatType.getCreatedDate(),
+                seatType.getUpdatedDate()
+        );
     }
 }

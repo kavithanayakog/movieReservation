@@ -3,6 +3,7 @@ package com.example.movie_reservation.serviceImplementation;
 
 import com.example.movie_reservation.model.*;
 import com.example.movie_reservation.repository.*;
+import com.example.movie_reservation.responseDTO.BookingResponseDTO;
 import com.example.movie_reservation.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class BookingServiceImpl implements BookingService {
     private final ShowTimeRepository showTimeRepository;
 
     @Override
-    public Booking createBooking(Long userId, Long showId, List<Long> seatIds) {
+    public BookingResponseDTO createBooking(Long userId, Long showId, List<Long> seatIds) {
 
         // 1️⃣ Validate User
         User user = userRepository.findById(userId)
@@ -58,8 +59,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = Booking.builder()
                 .bookingTime(LocalDateTime.now())
                 .status("CONFIRMED")
-                .seatCount(seatIds.size())
-                .totalAmount(totalAmount)
+                .amount(totalAmount)
                 .user(user)
                 .show(show)
                 .build();
@@ -78,7 +78,7 @@ public class BookingServiceImpl implements BookingService {
             bookingSeatRepository.save(bookingSeat);
         }
 
-        return booking;
+        return mapToDTO(booking);
     }
 
     @Override
@@ -89,11 +89,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<Booking> getAllBookings() {
+
         return bookingRepository.findAll();
     }
 
     @Override
-    public Booking cancelBooking(Long bookingId) {
+    public BookingResponseDTO cancelBooking(Long bookingId) {
 
         Booking booking = getBookingById(bookingId);
 
@@ -106,11 +107,14 @@ public class BookingServiceImpl implements BookingService {
         List<ShowSeat> showSeats =
                 showSeatRepository.findByShow_ShowId(booking.getShow().getShowId());
 
+        System.out.println("List" + showSeats);
+
         for (ShowSeat ss : showSeats) {
+            System.out.println("List" + showSeats.size());
             ss.setIsAvailable(true);
         }
 
-        return bookingRepository.save(booking);
+        return mapToDTO(bookingRepository.save(booking));
     }
 
     @Override
@@ -118,4 +122,18 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = getBookingById(bookingId);
         bookingRepository.delete(booking);
     }
+
+    private BookingResponseDTO mapToDTO(Booking booking) {
+        return new BookingResponseDTO(
+                booking.getBookingId(),
+                booking.getBookingTime(),
+                booking.getStatus(),
+                booking.getAmount(),
+                booking.getCreatedDate(),
+                booking.getUpdatedDate(),
+                booking.getUser().getName(),
+                booking.getShow().getMovie().getName()
+                );
+    }
+
 }

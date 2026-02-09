@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ScreenRepository extends JpaRepository<Screen,Long> {
 
-    boolean existsByScreenNumberAndTheatre_TheatreId(Integer screenNumber, Long theatreId);
+    boolean existsByScreenNameAndTheatre_TheatreId(String screenName, Long theatreId);
 
     List<Screen> findByTheatre_TheatreId(Long theatreId);
 }

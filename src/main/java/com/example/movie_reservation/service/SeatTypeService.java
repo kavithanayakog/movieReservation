@@ -1,14 +1,16 @@
 package com.example.movie_reservation.service;
 
 import com.example.movie_reservation.model.SeatType;
+import com.example.movie_reservation.requestDTO.SeatTypeRequestDTO;
+import com.example.movie_reservation.responseDTO.SeatTypeResponseDTO;
 
 import java.util.List;
 
 public interface SeatTypeService {
 
-    SeatType createSeatType(SeatType seatType);
+    SeatTypeResponseDTO createSeatType(SeatTypeRequestDTO seatType);
     SeatType getSeatTypeById(Long id);
-    SeatType updateSeatType(Long id, SeatType seatType);
+    SeatTypeResponseDTO updateSeatType(Long id, SeatTypeRequestDTO seatType);
     void deleteSeatType(Long id);
     List<SeatType> getAllSeatTypes();
 

@@ -1,7 +1,15 @@
 package com.example.movie_reservation.serviceImplementation;
 
+import com.example.movie_reservation.model.Movie;
+import com.example.movie_reservation.model.Screen;
 import com.example.movie_reservation.model.Seat;
+import com.example.movie_reservation.model.SeatType;
+import com.example.movie_reservation.repository.ScreenRepository;
 import com.example.movie_reservation.repository.SeatRepository;
+import com.example.movie_reservation.repository.SeatTypeRepository;
+import com.example.movie_reservation.requestDTO.SeatRequestDTO;
+import com.example.movie_reservation.responseDTO.SeatResponseDTO;
+import com.example.movie_reservation.responseDTO.UserResponseDTO;
 import com.example.movie_reservation.service.SeatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,17 +21,33 @@ import java.util.List;
 public class SeatServiceImpl implements SeatService {
 
     private final SeatRepository seatRepository;
+    private final SeatTypeRepository seatTypeRepository;
+    private final ScreenRepository screenRepository;
 
     @Override
-    public Seat createSeat(Seat seat) {
+    public SeatResponseDTO createSeat(SeatRequestDTO seat) {
+        SeatType seatType = seatTypeRepository.findById(seat.getSeatType())
+                .orElseThrow(() -> new RuntimeException("Seat type not found"));
+            Screen screen = screenRepository.findById(seat.getScreen())
+                .orElseThrow(() -> new RuntimeException("Screen not found"));
+
         boolean exists = seatRepository.existsBySeatNumberAndScreen_ScreenId(
                 seat.getSeatNumber(),
-                seat.getScreen().getScreenId()
+                seat.getScreen()
         );
         if (exists) {
             throw new RuntimeException("Seat already exists for this screen");
         }
-        return seatRepository.save(seat);
+
+        Seat seatRequest = Seat.builder()
+                .seatNumber(seat.getSeatNumber())
+                .createdDate(seat.getCreatedDate())
+                .updatedDate(seat.getUpdatedDate())
+                .seatType(seatType)
+                .screen(screen)
+                .build();
+
+        return mapToResponse(seatRepository.save(seatRequest));
     }
 
     @Override
@@ -43,19 +67,38 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
-    public Seat updateSeat(Long seatId, Seat seat) {
+    public SeatResponseDTO updateSeat(Long seatId, SeatRequestDTO seat) {
         Seat existing = getSeatById(seatId);
 
-        existing.setSeatNumber(seat.getSeatNumber());
-        existing.setSeatType(seat.getSeatType());
-        existing.setScreen(seat.getScreen());
+        SeatType seatType = seatTypeRepository.findById(seat.getSeatType())
 
-        return seatRepository.save(existing);
+                .orElseThrow(() -> new RuntimeException("seat type not found"));
+
+        Screen screen = screenRepository.findById(seat.getScreen())
+                .orElseThrow(() -> new RuntimeException("Screen not found"));
+
+        existing.setSeatNumber(seat.getSeatNumber());
+        existing.setSeatType(seatType);
+        existing.setScreen(screen);
+
+        return mapToResponse(seatRepository.save(existing));
     }
 
     @Override
     public void deleteSeat(Long seatId) {
         Seat seat = getSeatById(seatId);
         seatRepository.delete(seat);
+    }
+
+    private SeatResponseDTO mapToResponse(Seat seat) {
+
+        return new SeatResponseDTO(
+                seat.getSeatId(),
+                seat.getSeatNumber(),
+                seat.getCreatedDate(),
+                seat.getUpdatedDate(),
+                seat.getSeatType().getSeatTypeName(),
+                seat.getScreen().getScreenName()
+        );
     }
 }

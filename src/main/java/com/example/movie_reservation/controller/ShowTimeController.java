@@ -2,6 +2,8 @@ package com.example.movie_reservation.controller;
 
 
 import com.example.movie_reservation.model.ShowTime;
+import com.example.movie_reservation.requestDTO.ShowTimeRequestDTO;
+import com.example.movie_reservation.responseDTO.ShowTimeResponseDTO;
 import com.example.movie_reservation.service.ShowTimeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +18,7 @@ public class ShowTimeController {
     private final ShowTimeService showTimeService;
 
     @PostMapping
-    public ShowTime createShowTime(@RequestBody ShowTime showTime) {
+    public ShowTimeResponseDTO createShowTime(@RequestBody ShowTimeRequestDTO showTime) {
 
         return showTimeService.createShowTime(showTime);
     }
@@ -37,9 +39,9 @@ public class ShowTimeController {
     }
 
     @PutMapping("/{id}")
-    public ShowTime updateShowTime(
+    public ShowTimeResponseDTO updateShowTime(
             @PathVariable Long id,
-            @RequestBody ShowTime showTime) {
+            @RequestBody ShowTimeRequestDTO showTime) {
         return showTimeService.updateShowTime(id, showTime);
     }
 

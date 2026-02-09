@@ -1,6 +1,8 @@
 package com.example.movie_reservation.controller;
 
 import com.example.movie_reservation.model.Screen;
+import com.example.movie_reservation.requestDTO.ScreenRequestDTO;
+import com.example.movie_reservation.responseDTO.ScreenResponseDTO;
 import com.example.movie_reservation.service.ScreenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +17,7 @@ public class ScreenController {
     private final ScreenService screenService;
 
     @PostMapping
-    public Screen createScreens(@RequestBody Screen screen) {
+    public ScreenResponseDTO createScreens(@RequestBody ScreenRequestDTO screen) {
 
         return screenService.createScreen(screen);
     }
@@ -36,9 +38,9 @@ public class ScreenController {
     }
 
     @PutMapping("/{id}")
-    public Screen updateScreen(
+    public ScreenResponseDTO updateScreen(
             @PathVariable Long id,
-            @RequestBody Screen screen) {
+            @RequestBody ScreenRequestDTO screen) {
         return screenService.updateScreen(id, screen);
     }
 

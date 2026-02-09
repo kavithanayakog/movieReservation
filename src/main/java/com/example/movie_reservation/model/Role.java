@@ -1,5 +1,7 @@
 package com.example.movie_reservation.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,6 +15,7 @@ public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(name = "role_id")
     private Long roleId;
 

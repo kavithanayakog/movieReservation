@@ -25,8 +25,8 @@ public class Screen {
     @Column(name = "screen_id")
     private Long screenId;
 
-    @Column(name = "screen_number", nullable = false)
-    private Integer screenNumber;
+    @Column(name = "screen_name", nullable = false)
+    private String screenName;
 
     @Column(name = "total_seat_count", nullable = false)
     private Integer totalSeatCount;
@@ -38,8 +38,6 @@ public class Screen {
     @Column(name = "updated_date")
     @UpdateTimestamp
     private LocalDateTime updatedDate;
-
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theatre_id", nullable = false)

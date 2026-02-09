@@ -1,18 +1,20 @@
 package com.example.movie_reservation.service;
 
 import com.example.movie_reservation.model.User;
+import com.example.movie_reservation.requestDTO.UserRequestDTO;
+import com.example.movie_reservation.responseDTO.UserResponseDTO;
 
 import java.util.List;
 
 public interface UserService {
 
-    User createUser(User user);
+    UserResponseDTO createUser(UserRequestDTO user);
 
-    User getUserById(Long userId);
+    UserResponseDTO  getUserById(Long userId);
 
-    List<User> getAllUsers();
+    List<UserResponseDTO > getAllUsers();
 
-    User updateUser(Long userId, User user);
+    UserResponseDTO  updateUser(Long userId, UserRequestDTO user);
 
     void deleteUser(Long userId);
 }
