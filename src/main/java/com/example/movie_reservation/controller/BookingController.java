@@ -1,6 +1,7 @@
 package com.example.movie_reservation.controller;
 
 import com.example.movie_reservation.model.Booking;
+import com.example.movie_reservation.requestDTO.BookingSeatListDTO;
 import com.example.movie_reservation.responseDTO.BookingResponseDTO;
 import com.example.movie_reservation.service.BookingService;
 import lombok.RequiredArgsConstructor;
@@ -19,19 +20,21 @@ public class BookingController {
     @PostMapping
     public BookingResponseDTO createBooking(
             @RequestParam Long userId,
-            @RequestParam Long showId,
-            @RequestBody List<Long> seatIds) {
+            @RequestParam Long showId, BookingSeatListDTO seatIdRequest){
+            //@RequestBody List<Long> seatIds) {
 
-        return bookingService.createBooking(userId, showId, seatIds);
+        return bookingService.createBooking(userId, showId, seatIdRequest.getSeatIds());
     }
 
     @GetMapping("/{id}")
-    public Booking getBooking(@PathVariable Long id) {
+    public BookingResponseDTO getBookingById(@PathVariable Long id) {
+
         return bookingService.getBookingById(id);
     }
 
     @GetMapping
-    public List<Booking> getAllBookings() {
+    public List<BookingResponseDTO> getAllBookings() {
+
         return bookingService.getAllBookings();
     }
 

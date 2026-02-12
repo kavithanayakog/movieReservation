@@ -16,9 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.example.movie_reservation.constant.ExceptionMessages.ROLE_NOT_FOUND;
-import static com.example.movie_reservation.constant.ExceptionMessages.USER_NOT_FOUND;
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -29,7 +26,7 @@ public class UserServiceImpl implements UserService {
     //private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserResponseDTO createUser(UserRequestDTO user) {
+    public UserResponseDTO createUser(UserRequestDTO user) throws ResourceNotFoundException {
         System.out.println("Raw password: " + user.getPassword());
         //user.setPassword(encoder.encode(user.getPassword()));
         //return userRepository.save(user);
@@ -42,7 +39,7 @@ public class UserServiceImpl implements UserService {
         Long roleId = user.getRoleId();
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(ROLE_NOT_FOUND, HttpStatus.NOT_FOUND));
+                        new ResourceNotFoundException("Role not found: " + roleId));
 
 
         User userRequest = User.builder()
@@ -78,12 +75,11 @@ public class UserServiceImpl implements UserService {
      }
 
     @Override
-    public UserResponseDTO updateUser(Long userId, UserRequestDTO user) {
+    public UserResponseDTO updateUser(Long userId, UserRequestDTO user) throws ResourceNotFoundException{
 
         User userRequest = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+                        new ResourceNotFoundException("User not found: " + userId));
 
         // Email uniqueness check (if changed)
         if (!userRequest.getEmail().equalsIgnoreCase(user.getEmail())
@@ -94,7 +90,7 @@ public class UserServiceImpl implements UserService {
 
         Role role = roleRepository.findById(user.getRoleId())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException( ROLE_NOT_FOUND, HttpStatus.NOT_FOUND));
+                        new ResourceNotFoundException("ROLE NOT FOUND " + user.getRoleId()));
 
         userRequest.setName(user.getName());
         userRequest.setEmail(user.getEmail());
@@ -114,10 +110,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Long userId) {
+    public void deleteUser(Long userId) throws ResourceNotFoundException{
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+                        new ResourceNotFoundException("USER NOT FOUND " + userId));
 
         userRepository.delete(user);
     }

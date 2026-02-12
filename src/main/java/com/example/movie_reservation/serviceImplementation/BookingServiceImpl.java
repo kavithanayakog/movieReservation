@@ -1,6 +1,7 @@
 package com.example.movie_reservation.serviceImplementation;
 
 
+import com.example.movie_reservation.exception.ResourceNotFoundException;
 import com.example.movie_reservation.model.*;
 import com.example.movie_reservation.repository.*;
 import com.example.movie_reservation.responseDTO.BookingResponseDTO;
@@ -23,6 +24,7 @@ public class BookingServiceImpl implements BookingService {
     private final ShowSeatRepository showSeatRepository;
     private final UserRepository userRepository;
     private final ShowTimeRepository showTimeRepository;
+    private final PaymentRepository paymentRepository;
 
     @Override
     public BookingResponseDTO createBooking(Long userId, Long showId, List<Long> seatIds) {
@@ -35,10 +37,15 @@ public class BookingServiceImpl implements BookingService {
         ShowTime show = showTimeRepository.findById(showId)
                 .orElseThrow(() -> new RuntimeException("Show not found"));
 
+        System.out.println(" showId"+showId );
+        System.out.println(" seatIds"+seatIds );
         // 3️⃣ Validate Seats Exist for Show
         List<ShowSeat> showSeats =
                 showSeatRepository.findByShow_ShowIdAndSeat_SeatIdIn(showId, seatIds);
 
+        System.out.println(" showSeats"+showSeats );
+        System.out.println(" seatIds.size()"+showSeats.size() );
+        System.out.println(" seatIds.size()"+ seatIds.size());
         if (showSeats.size() != seatIds.size()) {
             throw new RuntimeException("Invalid seats selected");
         }
@@ -82,21 +89,27 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Booking getBookingById(Long bookingId) {
-        return bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+    public BookingResponseDTO getBookingById(Long bookingId) throws ResourceNotFoundException{
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found with booking id" + bookingId));
+
+        return mapToDTO(booking);
     }
 
     @Override
-    public List<Booking> getAllBookings() {
+    public List<BookingResponseDTO> getAllBookings() {
 
-        return bookingRepository.findAll();
+        return bookingRepository.findAll()
+                .stream()
+                .map(this::mapToDTO)
+                .toList();
     }
 
     @Override
-    public BookingResponseDTO cancelBooking(Long bookingId) {
+    public BookingResponseDTO cancelBooking(Long bookingId) throws ResourceNotFoundException {
 
-        Booking booking = getBookingById(bookingId);
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found" + bookingId));
 
         if ("CANCELLED".equals(booking.getStatus())) {
             throw new RuntimeException("Booking already cancelled");
@@ -118,8 +131,17 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public void deleteBooking(Long bookingId) {
-        Booking booking = getBookingById(bookingId);
+    public void deleteBooking(Long bookingId) throws ResourceNotFoundException{
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"+bookingId));
+
+        if (!booking.getStatus().equals("CANCELLED")) {
+            throw new IllegalStateException("Only cancelled bookings can be deleted");
+        }
+
+        bookingSeatRepository.deleteByBooking_BookingId(bookingId);
+        paymentRepository.deleteByBooking_BookingId(bookingId);
         bookingRepository.delete(booking);
     }
 

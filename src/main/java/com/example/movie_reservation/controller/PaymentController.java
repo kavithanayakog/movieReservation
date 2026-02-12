@@ -1,6 +1,8 @@
 package com.example.movie_reservation.controller;
 
 import com.example.movie_reservation.model.Payment;
+import com.example.movie_reservation.requestDTO.PaymentRequestDTO;
+import com.example.movie_reservation.responseDTO.PaymentResponseDTO;
 import com.example.movie_reservation.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,23 +17,23 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping
-    public Payment processPayment(@RequestBody Payment payment) {
+    public PaymentResponseDTO processPayment(@RequestBody PaymentRequestDTO payment) {
         // Placeholder for payment processing logic
         return paymentService.createPayment(payment);
     }
 
     @GetMapping("/{paymentId}")
-    public Payment getPaymentDetails(@PathVariable Long paymentId) {
+    public PaymentResponseDTO getPaymentDetails(@PathVariable Long paymentId) {
         return paymentService.getPaymentById(paymentId);
     }
 
     @GetMapping("/booking/{bookingId}")
-    public List<Payment> getPaymentByUser(@PathVariable Long bookingId) {
+    public List<PaymentResponseDTO> getPaymentByUser(@PathVariable Long bookingId) {
         return paymentService.getPaymentsByBooking(bookingId);
     }
 
     @PutMapping("/{id}/status")
-    public Payment updatePaymentStatus(@PathVariable Long id, @RequestParam  String status) {
+    public PaymentResponseDTO updatePaymentStatus(@PathVariable Long id, @RequestParam  String status) {
         return paymentService.updatePaymentStatus(id, status);
     }
 

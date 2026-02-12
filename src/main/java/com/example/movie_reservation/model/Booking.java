@@ -1,13 +1,16 @@
 package com.example.movie_reservation.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Table;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
+
+
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.*;
 
 @Entity
 @Table(name = "booking")
@@ -50,4 +53,11 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "show_id", nullable = false)
     private ShowTime show;
+
+    @OneToMany(
+            mappedBy = "booking",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<BookingSeat> bookingSeats = new ArrayList<>();
 }

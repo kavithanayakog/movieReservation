@@ -14,10 +14,10 @@ public final class GlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(
             value = {
-                    UserRoleNotFoundException.class
+                    ResourceNotFoundException.class
             })
-    public ResponseEntity<String> handleUserRoleNotFoundException(UserRoleNotFoundException ex) {
-        log.error("UserRoleNotFoundException: {}", ex.getMessage());
+    public ResponseEntity<String> handleUserRoleNotFoundException(ResourceNotFoundException ex) {
+        log.error("ResourceNotFoundException: {}", ex.getMessage());
         return ResponseEntity.status(400).body(ex.getMessage());
     }
 

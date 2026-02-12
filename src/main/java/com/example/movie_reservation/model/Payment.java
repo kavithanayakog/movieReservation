@@ -21,11 +21,11 @@ public class Payment {
     @Column(name = "payment_id")
     private Long paymentId;
 
-    @Column(name = "base_amount", nullable = false, precision = 10, scale = 2)
+  /*  @Column(name = "base_amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal baseAmount;
 
     @Column(name = "tax_amount", nullable = false, precision = 10, scale = 2)
-    private BigDecimal taxAmount;
+    private BigDecimal taxAmount;   */
 
     @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalAmount;
