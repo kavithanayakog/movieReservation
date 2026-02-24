@@ -40,19 +40,13 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequestDTO login) {
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequestDTO login)  throws ResourceNotFoundException{
 
         User dbUser = userRepo.findByEmail(login.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-
-      /*  if (!dbUser.isActive()) {
-            throw new IllegalStateException("User account is disabled");
-        }  */
-
-        // Validate password
         if (!passwordEncoder.matches(login.getPassword(), dbUser.getPassword())) {
-            throw new BadCredentialsException("Invalid email or password");
+            throw new ResourceNotFoundException("Invalid password");
         }
 
         // Generate JWT token

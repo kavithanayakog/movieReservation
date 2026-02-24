@@ -1,14 +1,14 @@
 package com.example.movie_reservation.serviceImplementation;
 
+import com.example.movie_reservation.exception.ResourceNotFoundException;
 import com.example.movie_reservation.model.*;
 import com.example.movie_reservation.repository.*;
 import com.example.movie_reservation.requestDTO.ShowTimeRequestDTO;
 import com.example.movie_reservation.responseDTO.ShowTimeResponseDTO;
 import com.example.movie_reservation.service.ShowTimeService;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import lombok.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,26 +22,30 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     private final MovieRepository movieRepository;
     private final ScreenRepository screenRepository;
     private  final SeatRepository seatRepository;
+    private final BookingRepository bookingRepository;
+    private final BookingSeatRepository bookingSeatRepository;
+    private final PaymentRepository paymentRepository;
 
     @Override
-    public ShowTimeResponseDTO createShowTime(ShowTimeRequestDTO showTime) {
+    public ShowTimeResponseDTO createShowTime(ShowTimeRequestDTO showTime) throws ResourceNotFoundException {
 
         Movie movie = movieRepository.findById(showTime.getMovieId())
-                .orElseThrow(() -> new RuntimeException("Movie not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Movie not found"));
 
        Screen screen = screenRepository.findById(showTime.getScreenId())
-                .orElseThrow(() -> new RuntimeException("Screen not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Screen not found"));
 
         if (!showTime.getStartTime().isBefore(showTime.getEndTime())) {
-            throw new RuntimeException("Start time must be before end time");
+            throw new ResourceNotFoundException("Start time must be before end time");
         }
         List<ShowTime> conflicts = showTimeRepository.findOverlappingShows(
                 screen.getScreenId(),
                 showTime.getStartTime(),
-                showTime.getEndTime()
+                showTime.getEndTime(),
+                movie.getMovieId()
         );
         if (!conflicts.isEmpty()) {
-            throw new RuntimeException("Show time overlaps with another show");
+            throw new ResourceNotFoundException("Another movie already scheduled for this screen at the same time");
         }
 
         ShowTime ShowTimeRequest = ShowTime.builder()
@@ -72,38 +76,49 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     }
 
     @Override
-    public List<ShowTime> getAllShowTime() {
-        return showTimeRepository.findAll();
+    public List<ShowTimeResponseDTO> getAllShowTime() {
+
+        return showTimeRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
-    public ShowTime getShowTimeById(Long showTimeId) {
-        return showTimeRepository.findById(showTimeId)
-                .orElseThrow(() -> new RuntimeException("ShowTime not found"));
+    public ShowTimeResponseDTO getShowTimeById(Long showTimeId) throws ResourceNotFoundException{
+        ShowTime showTime =  showTimeRepository.findById(showTimeId)
+                .orElseThrow(() -> new ResourceNotFoundException("ShowTime not found"));
+
+        return mapToResponse(showTime);
     }
 
     @Override
-    public ShowTimeResponseDTO updateShowTime(Long showTimeId, ShowTimeRequestDTO showTime) {
-        ShowTime existing = getShowTimeById(showTimeId);
+    public ShowTimeResponseDTO updateShowTime(Long showTimeId, ShowTimeRequestDTO showTime) throws ResourceNotFoundException{
+        ShowTime existing = showTimeRepository.findById(showTimeId)
+                .orElseThrow(() -> new ResourceNotFoundException("ShowTime not found"));
 
         Movie movie = movieRepository.findById(showTime.getMovieId())
-                .orElseThrow(() -> new RuntimeException("Movie not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Movie not found"));
 
         Screen screen = screenRepository.findById(showTime.getScreenId())
-                .orElseThrow(() -> new RuntimeException("Screen not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Screen not found"));
 
         if (!showTime.getStartTime().isBefore(showTime.getEndTime())) {
-            throw new RuntimeException("Invalid time range");
+            throw new ResourceNotFoundException("Invalid time range");
         }
 
         List<ShowTime> conflicts = showTimeRepository.findOverlappingShows(
                 existing.getScreen().getScreenId(),
                 showTime.getStartTime(),
-                showTime.getEndTime()
+                showTime.getEndTime(),
+                movie.getMovieId()
         );
 
+        System.out.println("  conflicts "+ conflicts.size());
+
         if (!conflicts.isEmpty()) {
-            throw new RuntimeException("Updated time overlaps with another show");
+            System.out.println("  conflicts inside if "+ conflicts);
+            throw new ResourceNotFoundException("Another movie already scheduled for this screen at the same time");
         }
 
         existing.setStartTime(showTime.getStartTime());
@@ -115,9 +130,33 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     }
 
     @Override
-    public void deleteShowTime(Long showTimeId) {
+    public void deleteShowTime(Long showTimeId) throws ResourceNotFoundException{
 
-        ShowTime showTime = getShowTimeById(showTimeId);
+        ShowTime showTime =  showTimeRepository.findById(showTimeId)
+                .orElseThrow(() -> new ResourceNotFoundException("ShowTime not found"));
+
+        Long showId = showTime.getShowId();
+        List<Booking> bookings = bookingRepository.findByShow_ShowId(showId);
+
+        for (Booking booking : bookings) {
+            if (!booking.getStatus().equalsIgnoreCase("CANCELLED")) {
+                throw new ResourceNotFoundException(
+                        "Cannot delete show. Active bookings exist.");
+            }
+        }
+
+        List<Long> bookingId = bookings.stream()
+                .map(Booking::getBookingId)
+                .toList();
+
+       if (!bookingId.isEmpty()) {
+
+            bookingSeatRepository.deleteByBooking_BookingIdIn(bookingId);
+
+            paymentRepository.deleteByBooking_BookingIdIn(bookingId);
+
+            bookingRepository.deleteAll(bookings);
+        }
         showSeatRepository.deleteAll(
                 showSeatRepository.findByShow_ShowId(showTimeId));
 
@@ -125,13 +164,15 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     }
 
     @Override
-    public List<ShowTime> getShowsByMovie(Long movieId) {
+    public List<ShowTimeResponseDTO> getShowsByMovie(Long movieId)  throws ResourceNotFoundException{
 
         if (!movieRepository.existsById(movieId)) {
-            throw new RuntimeException("Movie not found");
+            throw new ResourceNotFoundException("Movie not found");
         }
 
-        return showTimeRepository.findByMovie_MovieId(movieId);
+        return showTimeRepository.findByMovie_MovieId(movieId)
+                .stream().map(this::mapToResponse)
+                .toList();
 
     }
 

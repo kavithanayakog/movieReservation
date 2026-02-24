@@ -29,34 +29,29 @@ public class BookingSeatServiceImpl implements BookingSeatService {
     @Override
     public BookingSeatResponseDTO createBookingSeat(Long bookingId, Long seatId) throws ResourceNotFoundException {
 
-        // 1️⃣ Validate Booking exists
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
 
-        // 2️⃣ Validate Seat exists
         Seat seat = seatRepository.findById(seatId)
                 .orElseThrow(() -> new ResourceNotFoundException("Seat not found"));
 
-        // 3️⃣ Prevent duplicate booking-seat mapping
         if (bookingSeatRepository
                 .existsByBooking_BookingIdAndSeat_SeatId(bookingId, seatId)) {
             throw new ResourceNotFoundException("Seat already added to this booking");
         }
 
-        // 4️⃣ Validate Seat belongs to the same show as Booking
-        Long showId = booking.getShow().getShowId();
+       Long showId = booking.getShow().getShowId();
 
         ShowSeat showSeat = showSeatRepository
                 .findByShow_ShowIdAndSeat_SeatId(showId, seatId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Seat does not belong to this show"));
 
-        // 5️⃣ Validate Seat availability
-        if (!showSeat.getIsAvailable()) {
+       if (!showSeat.getIsAvailable()) {
             throw new ResourceNotFoundException("Seat is already booked");
         }
 
-        // 6️⃣ Lock seat (mark unavailable)
+        // making seat as unavailable)
         showSeat.setIsAvailable(false);
 
         // 7️⃣ Create BookingSeat
@@ -77,7 +72,6 @@ public class BookingSeatServiceImpl implements BookingSeatService {
     @Override
     public List<BookingSeatResponseDTO> getBookingSeatsByBooking(Long bookingId) {
 
-        // Validate Booking exists
         if (!bookingRepository.existsById(bookingId)) {
             throw new ResourceNotFoundException("Booking not found");
         }

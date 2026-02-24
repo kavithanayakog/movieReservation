@@ -24,10 +24,14 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleResponseDTO createRole(RoleRequestDTO roleRequest) throws ResourceNotFoundException {
 
-        roleRepository.findByRoleName(roleRequest.getRoleName())
+        roleRepository.findByRoleNameIgnoreCase(roleRequest.getRoleName())
                 .ifPresent(r -> {
-                    throw new ResourceNotFoundException("Role Name already exists" + roleRequest.getRoleName());
+                    throw new ResourceNotFoundException("Role Name already exists  " + roleRequest.getRoleName());
                 });
+
+        if(roleRequest.getRoleName().isEmpty() || "null".equalsIgnoreCase(roleRequest.getRoleName())){
+            throw new ResourceNotFoundException("Role Name can not be empty or null");
+        }
 
         Role roleEntity = Role.builder()
                 .roleName(roleRequest.getRoleName())
@@ -52,11 +56,15 @@ public class RoleServiceImpl implements RoleService {
     public RoleResponseDTO updateRole(Long roleId, RoleRequestDTO role) throws ResourceNotFoundException{
         Role existingRole = getRoleById(roleId);
 
-        roleRepository.findByRoleName(role.getRoleName())
+        roleRepository.findByRoleNameIgnoreCase(role.getRoleName())
                 .ifPresent(r -> {
                     throw new ResourceNotFoundException(" Role Name already exists " + role.getRoleName());
                 });
 
+        if(role.getRoleName().isEmpty() || "null".equalsIgnoreCase(role.getRoleName())){
+
+            throw new ResourceNotFoundException("Role name can not be empty or null");
+        }
         existingRole.setRoleName(role.getRoleName());
 
 
@@ -67,6 +75,7 @@ public class RoleServiceImpl implements RoleService {
     public void deleteRole(Long roleId) throws ResourceNotFoundException {
 
         Role role = getRoleById(roleId);
+
         //usersRepository.deleteAll(
                 //usersRepository.findByRole_RoleId(roleId));
 

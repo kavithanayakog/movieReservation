@@ -23,17 +23,17 @@ public class ScreenController {
     }
 
     @GetMapping("/{id}")
-    public Screen getScreen(@PathVariable Long id) {
+    public ScreenResponseDTO getScreen(@PathVariable Long id) {
         return screenService.getScreenById(id);
     }
 
     @GetMapping
-    public List<Screen> getAllScreens() {
+    public List<ScreenResponseDTO> getAllScreens() {
         return screenService.getAllScreens();
     }
 
     @GetMapping("/theatre/{theatreId}")
-    public List<Screen> getScreensByTheatre(@PathVariable Long theatreId) {
+    public List<ScreenResponseDTO> getScreensByTheatre(@PathVariable Long theatreId) {
         return screenService.getScreensByTheatre(theatreId);
     }
 

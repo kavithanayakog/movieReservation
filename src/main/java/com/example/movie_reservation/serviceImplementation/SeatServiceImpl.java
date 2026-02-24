@@ -1,12 +1,8 @@
 package com.example.movie_reservation.serviceImplementation;
 
-import com.example.movie_reservation.model.Movie;
-import com.example.movie_reservation.model.Screen;
-import com.example.movie_reservation.model.Seat;
-import com.example.movie_reservation.model.SeatType;
-import com.example.movie_reservation.repository.ScreenRepository;
-import com.example.movie_reservation.repository.SeatRepository;
-import com.example.movie_reservation.repository.SeatTypeRepository;
+import com.example.movie_reservation.exception.ResourceNotFoundException;
+import com.example.movie_reservation.model.*;
+import com.example.movie_reservation.repository.*;
 import com.example.movie_reservation.requestDTO.SeatRequestDTO;
 import com.example.movie_reservation.responseDTO.SeatResponseDTO;
 import com.example.movie_reservation.responseDTO.UserResponseDTO;
@@ -23,20 +19,23 @@ public class SeatServiceImpl implements SeatService {
     private final SeatRepository seatRepository;
     private final SeatTypeRepository seatTypeRepository;
     private final ScreenRepository screenRepository;
+    private final BookingSeatRepository bookingSeatRepository;
+    private final ShowSeatRepository showSeatRepository;
+
 
     @Override
-    public SeatResponseDTO createSeat(SeatRequestDTO seat) {
+    public SeatResponseDTO createSeat(SeatRequestDTO seat) throws ResourceNotFoundException{
         SeatType seatType = seatTypeRepository.findById(seat.getSeatType())
-                .orElseThrow(() -> new RuntimeException("Seat type not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Seat type not found"));
             Screen screen = screenRepository.findById(seat.getScreen())
-                .orElseThrow(() -> new RuntimeException("Screen not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Screen not found"));
 
         boolean exists = seatRepository.existsBySeatNumberAndScreen_ScreenId(
                 seat.getSeatNumber(),
                 seat.getScreen()
         );
         if (exists) {
-            throw new RuntimeException("Seat already exists for this screen");
+            throw new ResourceNotFoundException("Seat already exists for this screen");
         }
 
         Seat seatRequest = Seat.builder()
@@ -51,31 +50,48 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
-    public Seat getSeatById(Long seatId) {
-        return seatRepository.findById(seatId)
-                .orElseThrow(() -> new RuntimeException("Seat not found"));
+    public SeatResponseDTO getSeatById(Long seatId) throws ResourceNotFoundException {
+
+        Seat seat = seatRepository.findById(seatId)
+                .orElseThrow(() -> new ResourceNotFoundException("Seat not found"));
+
+        return mapToResponse(seat);
     }
 
     @Override
-    public List<Seat> getAllSeats() {
-        return seatRepository.findAll();
+    public List<SeatResponseDTO> getAllSeats() {
+
+        return seatRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+
     }
 
     @Override
-    public List<Seat> getSeatsByScreen(Long screenId) {
-        return seatRepository.findByScreen_ScreenId(screenId);
+    public List<SeatResponseDTO> getSeatsByScreen(Long screenId) {
+
+        List<Seat> seat = seatRepository.findAllByScreen_ScreenId(screenId) ;
+
+        if(seat.isEmpty() || !screenRepository.existsById(screenId)) {
+            throw new ResourceNotFoundException("No seats found for this screen");
+        }
+
+        return seat.stream().map(this::mapToResponse)
+                .toList();
     }
 
     @Override
-    public SeatResponseDTO updateSeat(Long seatId, SeatRequestDTO seat) {
-        Seat existing = getSeatById(seatId);
+    public SeatResponseDTO updateSeat(Long seatId, SeatRequestDTO seat) throws ResourceNotFoundException{
+        Seat existing = seatRepository.findById(seatId)
+                .orElseThrow(() -> new ResourceNotFoundException("Seat not found"));
 
         SeatType seatType = seatTypeRepository.findById(seat.getSeatType())
 
-                .orElseThrow(() -> new RuntimeException("seat type not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("seat type not found"));
 
         Screen screen = screenRepository.findById(seat.getScreen())
-                .orElseThrow(() -> new RuntimeException("Screen not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Screen not found"));
 
         existing.setSeatNumber(seat.getSeatNumber());
         existing.setSeatType(seatType);
@@ -85,8 +101,20 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
-    public void deleteSeat(Long seatId) {
-        Seat seat = getSeatById(seatId);
+    public void deleteSeat(Long seatId) throws  ResourceNotFoundException{
+
+        List<BookingSeat> bookings = bookingSeatRepository.findBySeat_SeatId(seatId);
+
+        if(!bookings.isEmpty()){
+            throw new ResourceNotFoundException("Cannot delete seat. Active bookings exist.");
+        }
+
+        Seat seat = seatRepository.findById(seatId)
+                .orElseThrow(() -> new ResourceNotFoundException("Seat not found"));
+
+        //showSeatRepository.deleteBySeat_SeatId(seat.getSeatId());
+
+        //seatRepository.deleteById(seatId);
         seatRepository.delete(seat);
     }
 

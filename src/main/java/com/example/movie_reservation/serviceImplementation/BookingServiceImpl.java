@@ -27,19 +27,17 @@ public class BookingServiceImpl implements BookingService {
     private final PaymentRepository paymentRepository;
 
     @Override
-    public BookingResponseDTO createBooking(Long userId, Long showId, List<Long> seatIds) {
+    public BookingResponseDTO createBooking(Long userId, Long showId, List<Long> seatIds) throws  ResourceNotFoundException{
 
-        // 1️⃣ Validate User
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+       User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        // 2️⃣ Validate Show
-        ShowTime show = showTimeRepository.findById(showId)
-                .orElseThrow(() -> new RuntimeException("Show not found"));
+       ShowTime show = showTimeRepository.findById(showId)
+                .orElseThrow(() -> new ResourceNotFoundException("Show not found"));
 
         System.out.println(" showId"+showId );
         System.out.println(" seatIds"+seatIds );
-        // 3️⃣ Validate Seats Exist for Show
+        //  Validate Seats Exist for Show
         List<ShowSeat> showSeats =
                 showSeatRepository.findByShow_ShowIdAndSeat_SeatIdIn(showId, seatIds);
 
@@ -47,13 +45,13 @@ public class BookingServiceImpl implements BookingService {
         System.out.println(" seatIds.size()"+showSeats.size() );
         System.out.println(" seatIds.size()"+ seatIds.size());
         if (showSeats.size() != seatIds.size()) {
-            throw new RuntimeException("Invalid seats selected");
+            throw new ResourceNotFoundException("Invalid seats selected");
         }
 
         // 4️⃣ Validate Seat Availability
         for (ShowSeat ss : showSeats) {
             if (!ss.getIsAvailable()) {
-                throw new RuntimeException("One or more seats already booked");
+                throw new ResourceNotFoundException("One or more seats already booked");
             }
         }
 
@@ -112,7 +110,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found" + bookingId));
 
         if ("CANCELLED".equals(booking.getStatus())) {
-            throw new RuntimeException("Booking already cancelled");
+            throw new ResourceNotFoundException("Booking already cancelled");
         }
 
         booking.setStatus("CANCELLED");
@@ -137,7 +135,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found"+bookingId));
 
         if (!booking.getStatus().equals("CANCELLED")) {
-            throw new IllegalStateException("Only cancelled bookings can be deleted");
+            throw new ResourceNotFoundException("Only cancelled bookings can be deleted");
         }
 
         bookingSeatRepository.deleteByBooking_BookingId(bookingId);

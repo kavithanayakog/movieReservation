@@ -6,7 +6,6 @@ import com.example.movie_reservation.requestDTO.RoleRequestDTO;
 import com.example.movie_reservation.responseDTO.RoleResponseDTO;
 import com.example.movie_reservation.service.RoleService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoleController {
 
-    @Autowired
    private final RoleService roleService;
 
     @PostMapping

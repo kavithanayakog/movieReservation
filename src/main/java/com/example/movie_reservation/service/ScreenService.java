@@ -10,11 +10,11 @@ public interface ScreenService {
 
     ScreenResponseDTO createScreen(ScreenRequestDTO screen);
 
-    Screen getScreenById(Long screenId);
+    ScreenResponseDTO getScreenById(Long screenId);
 
-    List<Screen> getAllScreens();
+    List<ScreenResponseDTO> getAllScreens();
 
-    List<Screen> getScreensByTheatre(Long theatreId);
+    List<ScreenResponseDTO> getScreensByTheatre(Long theatreId);
 
     ScreenResponseDTO updateScreen(Long screenId, ScreenRequestDTO screen);
 

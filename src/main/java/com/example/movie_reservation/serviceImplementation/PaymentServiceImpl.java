@@ -56,6 +56,10 @@ public class PaymentServiceImpl implements PaymentService {
             throw new ResourceNotFoundException("Invalid payment mode");
         }
 
+        System.out.println("Payment mode: " + payment.getPaymentStatus());
+
+        System.out.println("Payment mode: " + VALID_STATUS);
+
         // 5️⃣ Validate payment status
         if (!VALID_STATUS.contains(payment.getPaymentStatus())) {
             throw new ResourceNotFoundException("Invalid payment status");

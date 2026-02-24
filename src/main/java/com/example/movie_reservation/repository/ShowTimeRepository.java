@@ -13,13 +13,13 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime, Long> {
         SELECT s FROM ShowTime s
         WHERE s.screen.screenId = :screenId
         AND (
-            (:startTime < s.endTime AND :endTime > s.startTime)
-        )
-    """)
+            (:startTime < s.endTime AND :endTime > s.startTime)) AND s.movie.movieId = :movieId
+        """)
     List<ShowTime> findOverlappingShows(
             Long screenId,
             LocalDateTime startTime,
-            LocalDateTime endTime
+            LocalDateTime endTime,
+            Long movieId
     );
 
     List<ShowTime> findByMovie_MovieId(Long movieId);

@@ -32,15 +32,35 @@ public class UserServiceImpl implements UserService {
         //return userRepository.save(user);
 
         if (userRepository.existsByEmailIgnoreCase(user.getEmail())) {
-            throw new ResourceAlreadyExistsException(
+            throw new ResourceNotFoundException(
                     "Email already registered: " + user.getEmail());
+        }
+        if(user.getName().isEmpty() || "null".equalsIgnoreCase(user.getName())){
+
+            throw new ResourceNotFoundException("Name can not be empty or null");
+        }
+
+        if(user.getEmail().isEmpty() || "null".equalsIgnoreCase(user.getEmail())){
+
+            throw new ResourceNotFoundException("Email can not be empty or null");
+        }
+
+        if (user.getPhoneNo() == null || user.getPhoneNo().isEmpty()) {
+            throw new ResourceNotFoundException("Phone number cannot be null or empty");
+        }
+
+        if (!isValidEmail(user.getEmail())) {
+            throw new ResourceNotFoundException("Invalid email format");
+        }
+
+        if (!isValidPhone(user.getPhoneNo())) {
+            throw new ResourceNotFoundException("Invalid phone number");
         }
 
         Long roleId = user.getRoleId();
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Role not found: " + roleId));
-
 
         User userRequest = User.builder()
                 .name(user.getName())
@@ -57,9 +77,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDTO  getUserById(Long userId) {
+    public UserResponseDTO  getUserById(Long userId) throws ResourceNotFoundException{
         User user =userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return mapToResponse(user);
     }
@@ -87,6 +107,29 @@ public class UserServiceImpl implements UserService {
             throw new ResourceAlreadyExistsException(
                     "Email already registered: " + user.getEmail());
         }
+
+        if(user.getName().isEmpty() || "null".equalsIgnoreCase(user.getName())){
+
+            throw new ResourceNotFoundException("Name can not be empty or null");
+        }
+
+        if(user.getEmail().isEmpty() || "null".equalsIgnoreCase(user.getEmail())){
+
+            throw new ResourceNotFoundException("Email can not be empty or null");
+        }
+
+        if (user.getPhoneNo() == null || user.getPhoneNo().isEmpty()) {
+            throw new ResourceNotFoundException("Phone number cannot be null or empty");
+        }
+
+        if (!isValidEmail(user.getEmail())) {
+            throw new ResourceNotFoundException("Invalid email format");
+        }
+
+        if (!isValidPhone(user.getPhoneNo())) {
+            throw new ResourceNotFoundException("Invalid phone number");
+        }
+
 
         Role role = roleRepository.findById(user.getRoleId())
                 .orElseThrow(() ->
@@ -116,6 +159,16 @@ public class UserServiceImpl implements UserService {
                         new ResourceNotFoundException("USER NOT FOUND " + userId));
 
         userRepository.delete(user);
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return email.matches(emailRegex);
+    }
+
+    private boolean isValidPhone(String phone) {
+        String phoneRegex = "^[0-9]{10}$";
+        return phone.matches(phoneRegex);
     }
 
     private UserResponseDTO mapToResponse(User user) {

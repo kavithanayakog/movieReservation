@@ -1,5 +1,6 @@
 package com.example.movie_reservation.serviceImplementation;
 
+import com.example.movie_reservation.exception.ResourceNotFoundException;
 import com.example.movie_reservation.model.Movie;
 import com.example.movie_reservation.model.Role;
 import com.example.movie_reservation.model.User;
@@ -20,12 +21,11 @@ public class MovieServiceImpl implements MovieService {
     private final MovieRepository movieRepository;
 
     @Override
-    public MovieResponseDTO createMovie(MovieRequestDTO movieRequest) {
-
+    public MovieResponseDTO createMovie(MovieRequestDTO movieRequest) throws ResourceNotFoundException {
 
         movieRepository.findByNameIgnoreCase
                         (movieRequest.getName()).ifPresent(r -> {
-                    throw new RuntimeException("Movie already exists");
+                    throw new ResourceNotFoundException("Movie Name already exists");
                 });
 
         Movie movie = Movie.builder()
@@ -38,9 +38,9 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public Movie getMovieById(Long movieId) {
+    public Movie getMovieById(Long movieId) throws ResourceNotFoundException{
         return movieRepository.findById(movieId)
-                .orElseThrow(() -> new RuntimeException("Movie not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Movie not found"));
     }
 
     @Override
@@ -51,6 +51,14 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public MovieResponseDTO updateMovie(Long movieId, MovieRequestDTO movieRequest) {
         Movie existingMovie = getMovieById(movieId);
+
+        // Check duplicate name for different movieId
+        if (movieRepository.existsByNameIgnoreCaseAndMovieIdNot(
+                movieRequest.getName(), movieId)) {
+
+            throw new ResourceNotFoundException(
+                    "Movie name already exists: " + movieRequest.getName());
+        }
 
         existingMovie.setName(movieRequest.getName());
         existingMovie.setLanguage(movieRequest.getLanguage());

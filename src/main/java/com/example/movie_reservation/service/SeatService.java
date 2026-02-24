@@ -10,11 +10,11 @@ public interface SeatService {
 
     SeatResponseDTO createSeat(SeatRequestDTO seat);
 
-    Seat getSeatById(Long seatId);
+    SeatResponseDTO getSeatById(Long seatId);
 
-    List<Seat> getAllSeats();
+    List<SeatResponseDTO> getAllSeats();
 
-    List<Seat> getSeatsByScreen(Long screenId);
+    List<SeatResponseDTO> getSeatsByScreen(Long screenId);
 
     SeatResponseDTO updateSeat(Long seatId, SeatRequestDTO seat);
 

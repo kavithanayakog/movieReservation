@@ -14,13 +14,15 @@ public class TheatreRequestDTO {
     @NotBlank
     private String city;
 
+    @NotBlank
     private String state;
 
+    @NotBlank
     private String location;
 
-    @NotBlank
-    private LocalDateTime createdDate;
+    //@NotBlank
+   // private LocalDateTime createdDate;
 
-    @NotBlank
-    private LocalDateTime updatedDate;
+    //@NotBlank
+    //private LocalDateTime updatedDate;
 }

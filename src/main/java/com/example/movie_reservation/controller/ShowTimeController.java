@@ -24,17 +24,17 @@ public class ShowTimeController {
     }
 
     @GetMapping
-    public List<ShowTime> getAllShowTime() {
+    public List<ShowTimeResponseDTO> getAllShowTime() {
         return showTimeService.getAllShowTime();
     }
     @GetMapping("/{id}")
-    public ShowTime getShowTimeById(@PathVariable Long id) {
+    public ShowTimeResponseDTO getShowTimeById(@PathVariable Long id) {
 
         return showTimeService.getShowTimeById(id);
     }
 
     @GetMapping("/movie/{movieId}")
-    public List<ShowTime> getShowsByMovie(@PathVariable Long movieId) {
+    public List<ShowTimeResponseDTO> getShowsByMovie(@PathVariable Long movieId) {
         return showTimeService.getShowsByMovie(movieId);
     }
 
@@ -45,7 +45,7 @@ public class ShowTimeController {
         return showTimeService.updateShowTime(id, showTime);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public String deleteShowTime(@PathVariable Long id) {
         showTimeService.deleteShowTime(id);
         return "ShowTime deleted successfully";

@@ -4,21 +4,22 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "user_role")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
+@Table(name ="user_role")
 public class UserRole {
 
-    @Id
+  @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_role_id")
+    @Column(name ="user_role_id")
     private Long userRoleId;
 
-    @Column(name = "role_id", nullable = false)
-    private Long roleId;
+    @Column(name = "user_id", nullable = false, unique = true, length = 50)
+    private Long user_id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "role_id", nullable = false, unique = true, length = 50)
+    private Long role_id;
+
 }

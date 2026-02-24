@@ -1,6 +1,7 @@
 package com.example.movie_reservation.controller;
 
 import com.example.movie_reservation.model.ShowSeat;
+import com.example.movie_reservation.responseDTO.ShowSeatResponseDTO;
 import com.example.movie_reservation.service.ShowSeatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class ShowSeatController {
 
     // CREATE
     @PostMapping
-    public ShowSeat createShowSeat(
+    public ShowSeatResponseDTO createShowSeat(
             @RequestParam Long showId,
             @RequestParam Long seatId) {
         return showSeatService.createShowSeat(showId, seatId);
@@ -24,19 +25,20 @@ public class ShowSeatController {
 
     // READ by ID
     @GetMapping("/{id}")
-    public ShowSeat getShowSeat(@PathVariable Long id) {
+    public ShowSeatResponseDTO getShowSeat(@PathVariable Long id) {
+
         return showSeatService.getShowSeatById(id);
     }
 
     // READ by Show
     @GetMapping("/show/{showId}")
-    public List<ShowSeat> getSeatsByShow(@PathVariable Long showId) {
+    public List<ShowSeatResponseDTO> getSeatsByShow(@PathVariable Long showId) {
         return showSeatService.getShowSeatsByShow(showId);
     }
 
     // UPDATE availability
     @PutMapping("/{id}/availability")
-    public ShowSeat updateAvailability(
+    public ShowSeatResponseDTO updateAvailability(
             @PathVariable Long id,
             @RequestParam Boolean isAvailable) {
         return showSeatService.updateAvailability(id, isAvailable);

@@ -23,19 +23,19 @@ public class SeatController {
     }
 
     @GetMapping("/{id}")
-    public Seat getSeat(@PathVariable Long id) {
+    public SeatResponseDTO getSeat(@PathVariable Long id) {
 
         return seatService.getSeatById(id);
     }
 
     @GetMapping
-    public List<Seat> getAllSeats() {
+    public List<SeatResponseDTO> getAllSeats() {
 
         return seatService.getAllSeats();
     }
 
     @GetMapping("/screen/{screenId}")
-    public List<Seat> getSeatsByScreen(@PathVariable Long screenId) {
+    public List<SeatResponseDTO> getSeatsByScreen(@PathVariable Long screenId) {
 
         return seatService.getSeatsByScreen(screenId);
     }

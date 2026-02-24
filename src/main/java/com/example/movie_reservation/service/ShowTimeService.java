@@ -10,13 +10,13 @@ public interface ShowTimeService {
 
     ShowTimeResponseDTO createShowTime(ShowTimeRequestDTO showTime);
 
-    List<ShowTime> getAllShowTime();
+    List<ShowTimeResponseDTO> getAllShowTime();
 
-    ShowTime getShowTimeById(Long showTimeId);
+    ShowTimeResponseDTO getShowTimeById(Long showTimeId);
 
     ShowTimeResponseDTO updateShowTime(Long showTimeId, ShowTimeRequestDTO showTime);
 
     void deleteShowTime(Long showTimeId);
 
-    List<ShowTime> getShowsByMovie(Long movieId);
+    List<ShowTimeResponseDTO> getShowsByMovie(Long movieId);
 }
