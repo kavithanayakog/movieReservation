@@ -51,7 +51,7 @@ public class PaymentServiceImpl implements PaymentService {
                     "Total amount must be base + tax");
         }  */
 
-        // 4️⃣ Validate payment mode
+        // Validate payment mode
         if (!VALID_MODES.contains(payment.getPaymentMode())) {
             throw new ResourceNotFoundException("Invalid payment mode");
         }
@@ -60,12 +60,12 @@ public class PaymentServiceImpl implements PaymentService {
 
         System.out.println("Payment mode: " + VALID_STATUS);
 
-        // 5️⃣ Validate payment status
+        // Validate payment status
         if (!VALID_STATUS.contains(payment.getPaymentStatus())) {
             throw new ResourceNotFoundException("Invalid payment status");
         }
 
-        // 6️⃣ Set payment time if SUCCESS
+        // Set payment time if SUCCESS
         if ("SUCCESS".equals(payment.getPaymentStatus())) {
             payment.setPaymentTime(LocalDateTime.now());
         }

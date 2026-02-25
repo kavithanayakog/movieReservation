@@ -10,6 +10,7 @@ import lombok.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -35,24 +36,28 @@ public class ShowTimeServiceImpl implements ShowTimeService {
        Screen screen = screenRepository.findById(showTime.getScreenId())
                 .orElseThrow(() -> new ResourceNotFoundException("Screen not found"));
 
-        if (!showTime.getStartTime().isBefore(showTime.getEndTime())) {
+        LocalDateTime startTime = showTime.getStartTime();
+        LocalDateTime endTime = startTime.plusMinutes(movie.getDuration());
+
+        if (!showTime.getStartTime().isBefore(endTime)) {
             throw new ResourceNotFoundException("Start time must be before end time");
         }
         List<ShowTime> conflicts = showTimeRepository.findOverlappingShows(
                 screen.getScreenId(),
                 showTime.getStartTime(),
-                showTime.getEndTime(),
+                endTime,
                 movie.getMovieId()
         );
         if (!conflicts.isEmpty()) {
             throw new ResourceNotFoundException("Another movie already scheduled for this screen at the same time");
         }
 
-        ShowTime ShowTimeRequest = ShowTime.builder()
+          ShowTime ShowTimeRequest = ShowTime.builder()
                 .startTime(showTime.getStartTime())
-                .endTime(showTime.getEndTime())
-                .createdDate(showTime.getCreatedDate())
-                .updatedDate(showTime.getUpdatedDate())
+                //.endTime(showTime.getEndTime())
+                .endTime(endTime)
+                .createdDate(LocalDateTime.now())
+                .updatedDate(LocalDateTime.now())
                 .movie(movie)
                 .screen(screen)
                 .build();
@@ -103,14 +108,17 @@ public class ShowTimeServiceImpl implements ShowTimeService {
         Screen screen = screenRepository.findById(showTime.getScreenId())
                 .orElseThrow(() -> new ResourceNotFoundException("Screen not found"));
 
-        if (!showTime.getStartTime().isBefore(showTime.getEndTime())) {
+        LocalDateTime startTime = showTime.getStartTime();
+        LocalDateTime endTime = startTime.plusMinutes(movie.getDuration());
+
+        if (!showTime.getStartTime().isBefore(endTime)) {
             throw new ResourceNotFoundException("Invalid time range");
         }
 
         List<ShowTime> conflicts = showTimeRepository.findOverlappingShows(
                 existing.getScreen().getScreenId(),
                 showTime.getStartTime(),
-                showTime.getEndTime(),
+                endTime,
                 movie.getMovieId()
         );
 
@@ -122,7 +130,7 @@ public class ShowTimeServiceImpl implements ShowTimeService {
         }
 
         existing.setStartTime(showTime.getStartTime());
-        existing.setEndTime(showTime.getEndTime());
+        existing.setEndTime(endTime);
         existing.setMovie(movie);
         existing.setScreen(screen);
 

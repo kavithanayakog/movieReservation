@@ -20,15 +20,6 @@ public class ShowTimeRequestDTO {
     private LocalDateTime startTime;
 
     @NotBlank
-    private LocalDateTime endTime;
-
-    @NotBlank
-    private LocalDateTime createdDate;
-
-    @NotBlank
-    private LocalDateTime updatedDate;
-
-    @NotBlank
     private Long movieId;
 
     @NotBlank

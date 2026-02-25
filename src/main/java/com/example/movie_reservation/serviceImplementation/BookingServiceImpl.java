@@ -37,30 +37,32 @@ public class BookingServiceImpl implements BookingService {
 
         System.out.println(" showId"+showId );
         System.out.println(" seatIds"+seatIds );
+
         //  Validate Seats Exist for Show
         List<ShowSeat> showSeats =
                 showSeatRepository.findByShow_ShowIdAndSeat_SeatIdIn(showId, seatIds);
 
-        System.out.println(" showSeats"+showSeats );
-        System.out.println(" seatIds.size()"+showSeats.size() );
-        System.out.println(" seatIds.size()"+ seatIds.size());
+       // System.out.println(" showSeats"+showSeats );
+        //System.out.println(" seatIds.size()"+showSeats.size() );
+        //System.out.println(" seatIds.size()"+ seatIds.size());
         if (showSeats.size() != seatIds.size()) {
             throw new ResourceNotFoundException("Invalid seats selected");
         }
 
-        // 4️⃣ Validate Seat Availability
+        // Validate Seat Availability
         for (ShowSeat ss : showSeats) {
             if (!ss.getIsAvailable()) {
                 throw new ResourceNotFoundException("One or more seats already booked");
             }
         }
 
-        // 5️⃣ Calculate Amount
+        // Calculate Amount
         BigDecimal totalAmount = showSeats.stream()
                 .map(ss -> ss.getSeat().getSeatType().getAmount())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // 6️⃣ Create Booking
+
+        // Create Booking
         Booking booking = Booking.builder()
                 .bookingTime(LocalDateTime.now())
                 .status("CONFIRMED")
